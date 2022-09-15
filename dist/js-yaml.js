@@ -4,7 +4,7 @@
   typeof exports === 'object' && typeof module !== 'undefined' ? factory(exports) :
   typeof define === 'function' && define.amd ? define(['exports'], factory) :
   (global = typeof globalThis !== 'undefined' ? globalThis : global || self, factory(global.jsyaml = {}));
-}(this, (function (exports) { 'use strict';
+})(this, (function (exports) { 'use strict';
 
   function isNothing(subject) {
     return (typeof subject === 'undefined') || (subject === null);
@@ -3026,6 +3026,12 @@
         ||  (0x10000 <= c && c <= 0x10FFFF);
   }
 
+  // Return true if the char is printable or a tab.
+  // derived from nb-char - #x85 - #xA0 - #x2028 - #x2029.
+  function isPrintableWithTabs(c) {
+    return isPrintable(c) || c === CHAR_TAB || c === CHAR_LINE_FEED || c === CHAR_CARRIAGE_RETURN;
+  }
+
   // [34] ns-char ::= nb-char - s-white
   // [27] nb-char ::= c-printable - b-char - c-byte-order-mark
   // [26] b-char  ::= b-line-feed | b-carriage-return
@@ -3159,7 +3165,7 @@
       // Check for disallowed characters to rule out plain and single.
       for (i = 0; i < string.length; char >= 0x10000 ? i += 2 : i++) {
         char = codePointAt(string, i);
-        if (!isPrintable(char)) {
+        if (!isPrintableWithTabs(char)) {
           return STYLE_DOUBLE;
         }
         plain = plain && isPlainSafe(char, prevChar, inblock);
@@ -3179,7 +3185,7 @@
                string[previousLineBreak + 1] !== ' ');
             previousLineBreak = i;
           }
-        } else if (!isPrintable(char)) {
+        } else if (!isPrintableWithTabs(char)) {
           return STYLE_DOUBLE;
         }
         plain = plain && isPlainSafe(char, prevChar, inblock);
@@ -3860,7 +3866,7 @@
   exports.Schema = Schema;
   exports.Type = Type;
   exports.YAMLException = YAMLException;
-  exports.default = jsYaml;
+  exports["default"] = jsYaml;
   exports.dump = dump;
   exports.load = load;
   exports.loadAll = loadAll;
@@ -3871,4 +3877,4 @@
 
   Object.defineProperty(exports, '__esModule', { value: true });
 
-})));
+}));

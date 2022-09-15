@@ -3020,6 +3020,12 @@ function isPrintable(c) {
       ||  (0x10000 <= c && c <= 0x10FFFF);
 }
 
+// Return true if the char is printable or a tab.
+// derived from nb-char - #x85 - #xA0 - #x2028 - #x2029.
+function isPrintableWithTabs(c) {
+  return isPrintable(c) || c === CHAR_TAB || c === CHAR_LINE_FEED || c === CHAR_CARRIAGE_RETURN;
+}
+
 // [34] ns-char ::= nb-char - s-white
 // [27] nb-char ::= c-printable - b-char - c-byte-order-mark
 // [26] b-char  ::= b-line-feed | b-carriage-return
@@ -3153,7 +3159,7 @@ function chooseScalarStyle(string, singleLineOnly, indentPerLevel, lineWidth,
     // Check for disallowed characters to rule out plain and single.
     for (i = 0; i < string.length; char >= 0x10000 ? i += 2 : i++) {
       char = codePointAt(string, i);
-      if (!isPrintable(char)) {
+      if (!isPrintableWithTabs(char)) {
         return STYLE_DOUBLE;
       }
       plain = plain && isPlainSafe(char, prevChar, inblock);
@@ -3173,7 +3179,7 @@ function chooseScalarStyle(string, singleLineOnly, indentPerLevel, lineWidth,
              string[previousLineBreak + 1] !== ' ');
           previousLineBreak = i;
         }
-      } else if (!isPrintable(char)) {
+      } else if (!isPrintableWithTabs(char)) {
         return STYLE_DOUBLE;
       }
       plain = plain && isPlainSafe(char, prevChar, inblock);
@@ -3847,5 +3853,4 @@ var jsYaml = {
 	safeDump: safeDump
 };
 
-export default jsYaml;
-export { CORE_SCHEMA, DEFAULT_SCHEMA, FAILSAFE_SCHEMA, JSON_SCHEMA, Schema, Type, YAMLException, dump, load, loadAll, safeDump, safeLoad, safeLoadAll, types };
+export { CORE_SCHEMA, DEFAULT_SCHEMA, FAILSAFE_SCHEMA, JSON_SCHEMA, Schema, Type, YAMLException, jsYaml as default, dump, load, loadAll, safeDump, safeLoad, safeLoadAll, types };
